@@ -28,6 +28,7 @@ export const useBridgeTypeValue = (): {
   const bridgeTypeList = [
     { value: BridgeType.Webhook, label: t('Auth.HTTPServer') },
     { value: BridgeType.MQTT, label: t('RuleEngine.mqttBroker') },
+    { value: BridgeType.KafkaProducer, label: t('RuleEngine.kafkaProducer') },
   ].sort((a, b) => (bridgeOrderIndex[a.value] ?? 99) - (bridgeOrderIndex[b.value] ?? 99))
 
   /**

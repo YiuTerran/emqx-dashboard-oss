@@ -6,5 +6,9 @@
   "mqtt": {
     "source_topic": "Topic",
     "no_local": "No Local"
+  },
+  "kafka_producer": {
+    "request_timeout": "Request Timeout",
+    "allow_auto_topic_creation": "Allow Auto Topic Creation"
   }
 }

@@ -347,6 +347,10 @@ export default {
     zh: '正在发送到外部数据系统并等待响应的消息数',
     en: 'Number of messages being sent to the external data system and awaiting response',
   },
+  kafkaProducer: {
+    zh: 'Kafka 生产者',
+    en: 'Kafka Producer',
+  },
   lateReply: {
     zh: '超期回复',
     en: 'Late Reply',

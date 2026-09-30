@@ -6,5 +6,9 @@
   "mqtt": {
     "source_topic": "主题",
     "no_local": "禁止本地转发"
+  },
+  "kafka_producer": {
+    "request_timeout": "请求超时时间",
+    "allow_auto_topic_creation": "允许自动创建主题"
   }
 }

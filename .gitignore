@@ -1,6 +1,8 @@
 .DS_Store
 node_modules
 /dist
+# release asset produced by CI / local `yarn build` packaging
+*.zip
 
 
 # local env files
