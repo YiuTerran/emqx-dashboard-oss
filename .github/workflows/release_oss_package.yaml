@@ -1,14 +1,14 @@
 name: release oss package
 
-# Fork-specific replacement for the upstream `tag.yaml` chain.
+# Fork-specific replacement for the upstream tag/release chain.
 #
-# Upstream's chain (tag.yaml -> build_emqx_for_test -> check_package_version ->
-# build_oss_package) can not run in this fork: it builds emqx/emqx release-58,
-# gates the dashboard package on `scripts/checkPackageVersion.js` (which exits
-# non-zero whenever the just-started EMQX container is not answering yet), and
-# needs GitHub App secrets to dispatch a workflow into emqx/emqx.
+# The upstream chain (tag.yaml -> build_emqx_for_test -> check_package_version ->
+# build_oss_package) has been removed: it built emqx/emqx release-58, gated the
+# dashboard package on `scripts/checkPackageVersion.js` (which exits non-zero
+# whenever the just-started EMQX container is not answering yet), and needed
+# GitHub App secrets to dispatch a workflow into emqx/emqx.
 #
-# This workflow only produces the dashboard asset that
+# This is the only workflow in the fork. It produces the dashboard asset that
 # `emqx-oss/scripts/get-dashboard.sh` downloads:
 #   https://github.com/YiuTerran/emqx-dashboard-oss/releases/download/<tag>/emqx-dashboard-<tag>.zip
 
