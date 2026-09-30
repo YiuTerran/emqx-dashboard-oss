@@ -1,0 +1,69 @@
+name: release oss package
+
+# Fork-specific replacement for the upstream `tag.yaml` chain.
+#
+# Upstream's chain (tag.yaml -> build_emqx_for_test -> check_package_version ->
+# build_oss_package) can not run in this fork: it builds emqx/emqx release-58,
+# gates the dashboard package on `scripts/checkPackageVersion.js` (which exits
+# non-zero whenever the just-started EMQX container is not answering yet), and
+# needs GitHub App secrets to dispatch a workflow into emqx/emqx.
+#
+# This workflow only produces the dashboard asset that
+# `emqx-oss/scripts/get-dashboard.sh` downloads:
+#   https://github.com/YiuTerran/emqx-dashboard-oss/releases/download/<tag>/emqx-dashboard-<tag>.zip
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '16'
+          cache: yarn
+
+      - name: install deps
+        run: yarn install --frozen-lockfile
+
+      - name: build
+        run: yarn build
+
+      # Guard: never publish an asset that lacks the Kafka entry points.
+      - name: verify kafka entry is present in the bundle
+        run: |
+          set -e
+          ls dist/static/img/kafka_producer.*.png >/dev/null
+          grep -q 'Kafka 生产者' dist/static/js/app*.js
+          grep -q 'Kafka Producer' dist/static/js/app*.js
+          echo "kafka entry verified"
+
+      - name: package
+        run: |
+          set -e
+          touch dist/version
+          echo "github_ref: ${GITHUB_REF}" >> dist/version
+          echo "github_sha: ${GITHUB_SHA}" >> dist/version
+          zip -rq "emqx-dashboard-${GITHUB_REF_NAME}.zip" ./dist
+          unzip -l "emqx-dashboard-${GITHUB_REF_NAME}.zip" | head -5
+
+      - name: publish release asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -e
+          gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1 || \
+            gh release create "${GITHUB_REF_NAME}" \
+              --title "EMQX Dashboard ${GITHUB_REF_NAME}" \
+              --generate-notes
+          gh release upload "${GITHUB_REF_NAME}" \
+            "emqx-dashboard-${GITHUB_REF_NAME}.zip" --clobber
