@@ -67,6 +67,8 @@ jobs:
 
       - name: Check request security
         run: yarn test:request-security
+      - name: Check i18n component compatibility
+        run: yarn test:i18n-compatibility
 
       # Guard: never publish an asset that lacks the Kafka entry points.
       - name: verify kafka entry is present in the bundle

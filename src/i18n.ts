@@ -48,6 +48,8 @@ lang.en.SchemaSymbolLabel = symbolLabelEn
 lang.zh.SchemaSymbolLabel = symbolLabelZh
 
 const i18nInstance = createI18n({
+  legacy: true,
+  allowComposition: true,
   messages: lang,
   locale: store.state.lang,
   warnHtmlInMessage: 'off',
