@@ -48,16 +48,16 @@ lang.en.SchemaSymbolLabel = symbolLabelEn
 lang.zh.SchemaSymbolLabel = symbolLabelZh
 
 const i18nInstance = createI18n({
-  legacy: true,
-  allowComposition: true,
+  legacy: false,
+  globalInjection: true,
   messages: lang,
   locale: store.state.lang,
-  warnHtmlInMessage: 'off',
+  warnHtmlMessage: false,
 })
 
 export const getLocalMessage = (path: string): string => {
-  const local = i18nInstance.global.locale
-  const messages = i18nInstance.global.messages[local]
+  const local = i18nInstance.global.locale.value
+  const messages = i18nInstance.global.getLocaleMessage(local)
   return get(messages, path)
 }
 
