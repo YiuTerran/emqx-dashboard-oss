@@ -9,6 +9,7 @@
     "build:enterprise": "VUE_APP_VERSION=enterprise vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
     "test:copy-secrets": "node scripts/checkCopySecrets.js",
+    "test:request-security": "node scripts/checkRequestSecurity.js",
     "lint": "vue-cli-service lint",
     "format": "prettier --write \"src/**/*.js\" \"src/**/*.ts\" \"src/**/*.tsx\" \"src/**/*.vue\" \"src/**/*.scss\"",
     "escape": "node ./scripts/escapeI18N.js",
@@ -23,7 +24,7 @@
     "@emqx/shared-ui-utils": "^0.0.14",
     "@highlightjs/vue-plugin": "^2.1.0",
     "@vue-flow/core": "^1.20.1",
-    "axios": "^1.4.0",
+    "axios": "1.20.0",
     "compare-versions": "^6.0.0-rc.3",
     "copy-to-clipboard": "^3.3.1",
     "crypto-js": "^4.1.1",
@@ -43,10 +44,13 @@
     "qs": "^6.12.1",
     "sortablejs": "^1.14.0",
     "vue": "~3.2.16",
-    "vue-i18n": "^9.2.0-beta.19",
+    "vue-i18n": "9.14.5",
     "vue-router": "^4.0.0-0",
     "vuex": "^4.0.0-0",
     "xss": "^1.0.14"
+  },
+  "resolutions": {
+    "vue-i18n": "9.14.5"
   },
   "devDependencies": {
     "@types/crypto-js": "^4.1.1",

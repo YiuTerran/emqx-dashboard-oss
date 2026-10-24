@@ -11,6 +11,7 @@ import { API_BASE_URL, REQUEST_TIMEOUT_CODE } from '@/common/constants'
 import { BAD_TOKEN, TOKEN_TIME_OUT, NAME_PWD_ERROR } from '@/common/customErrorCode'
 import { trimValues } from '@/common/tools'
 import i18n from '@/i18n'
+import { setApiAuthorization } from '@/common/requestAuthorization'
 
 NProgress.configure({ showSpinner: false, trickleSpeed: 200 })
 let respSet = new Set()
@@ -24,9 +25,7 @@ Object.assign(axios.defaults, {
 axios.interceptors.request.use(
   (config) => {
     const { user } = store.state
-    config.headers = {
-      Authorization: 'Bearer ' + user.token,
-    }
+    setApiAuthorization(config, user.token, API_BASE_URL, document.baseURI)
     const controller = new AbortController()
     config.signal = controller.signal
     config.controller = controller
@@ -42,7 +41,7 @@ axios.interceptors.request.use(
     return config
   },
   (error) => {
-    Promise.reject(error)
+    return Promise.reject(error)
   },
 )
 
@@ -108,6 +107,10 @@ axios.interceptors.response.use(
     return response.data || response.status
   },
   async (error) => {
+    if (!error.config) {
+      await setProgressBarDone()
+      return Promise.reject(error)
+    }
     if (!error.config.doNotTriggerProgress) {
       setProgressBarDone()
     }

@@ -65,6 +65,9 @@ jobs:
       - name: Check connector copy secrets
         run: yarn test:copy-secrets
 
+      - name: Check request security
+        run: yarn test:request-security
+
       # Guard: never publish an asset that lacks the Kafka entry points.
       - name: verify kafka entry is present in the bundle
         run: |
