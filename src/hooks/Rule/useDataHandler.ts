@@ -42,12 +42,9 @@ const useCommonDataHandler = () => {
 
   // When copying, set to empty value.
   // When saving as a copy, check if it has been modified.
-  const likePasswordFieldKeys = ['password'].reduce(
-    (arr: Array<string>, key) => [...arr, key, `parameters.${key}`],
-    [],
-  )
+  const likePasswordFieldKeys = ['password', 'parameters.password', 'authentication.password']
   const handleDataForCopy = (data: any): any => {
-    const ret = omit(data, keysNeedDel.saveAsCopy)
+    const ret = omit(cloneDeep(data), keysNeedDel.saveAsCopy)
     likePasswordFieldKeys.forEach((key) => {
       if (get(ret, key) !== undefined) {
         set(ret, key, '')

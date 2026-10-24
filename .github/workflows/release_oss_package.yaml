@@ -17,6 +17,11 @@ on:
     tags:
       - 'v*'
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Existing release tag (v*) to build'
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -25,7 +30,26 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
+      - name: Select release tag
+        env:
+          REQUESTED_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref_name }}
+        run: |
+          case "$REQUESTED_TAG" in
+            v?*) ;;
+            *)
+              echo "::error::A release tag beginning with v is required."
+              exit 1
+              ;;
+          esac
+          if [[ ! "$REQUESTED_TAG" =~ ^v[0-9A-Za-z._-]+$ ]]; then
+            echo "::error::Invalid release tag."
+            exit 1
+          fi
+          echo "RELEASE_TAG=$REQUESTED_TAG" >> "$GITHUB_ENV"
+
       - uses: actions/checkout@v4
+        with:
+          ref: refs/tags/${{ env.RELEASE_TAG }}
 
       - uses: actions/setup-node@v4
         with:
@@ -37,6 +61,9 @@ jobs:
 
       - name: build
         run: yarn build
+
+      - name: Check connector copy secrets
+        run: yarn test:copy-secrets
 
       # Guard: never publish an asset that lacks the Kafka entry points.
       - name: verify kafka entry is present in the bundle
@@ -51,19 +78,19 @@ jobs:
         run: |
           set -e
           touch dist/version
-          echo "github_ref: ${GITHUB_REF}" >> dist/version
-          echo "github_sha: ${GITHUB_SHA}" >> dist/version
-          zip -rq "emqx-dashboard-${GITHUB_REF_NAME}.zip" ./dist
-          unzip -l "emqx-dashboard-${GITHUB_REF_NAME}.zip" | head -5
+          echo "github_ref: refs/tags/${RELEASE_TAG}" >> dist/version
+          echo "github_sha: $(git rev-parse HEAD)" >> dist/version
+          zip -rq "emqx-dashboard-${RELEASE_TAG}.zip" ./dist
+          unzip -l "emqx-dashboard-${RELEASE_TAG}.zip" | sed -n '1,5p'
 
       - name: publish release asset
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -e
-          gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1 || \
-            gh release create "${GITHUB_REF_NAME}" \
-              --title "EMQX Dashboard ${GITHUB_REF_NAME}" \
+          gh release view "${RELEASE_TAG}" >/dev/null 2>&1 || \
+            gh release create "${RELEASE_TAG}" \
+              --title "EMQX Dashboard ${RELEASE_TAG}" \
               --generate-notes
-          gh release upload "${GITHUB_REF_NAME}" \
-            "emqx-dashboard-${GITHUB_REF_NAME}.zip" --clobber
+          gh release upload "${RELEASE_TAG}" \
+            "emqx-dashboard-${RELEASE_TAG}.zip" --clobber
